@@ -10,7 +10,7 @@ bokeh server --show timer.py
 When the timer launches in the browser, you can use the sliders to adjust the limit on the timer, and the buttons to start, stop/pause, and reset the timer.
 
 #### Requirements
-- bokeh 0.12 or above
+- [bokeh](http://bokeh.pydata.org/en/latest/index.html) 0.12 or above
 
 #### Issues - Help/Advice Welcome!
 - I'm troubled by the inclusion of `global` statements in the code. I think that there must be a way to achieve the same behavious without these statements. If you have advice on how I might do this, please get in touch!
