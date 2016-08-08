@@ -7,127 +7,154 @@ usage: bokeh serve --show timer.py
 # Imports
 from bokeh.layouts import column, row
 from bokeh import plotting as bkplt
-from bokeh.models import ColumnDataSource, Button, Slider
-from bokeh.driving import count
-
-# Functions
-@count()
-def countdown(step):
-    '''Count down the time remaining'''
-    global seconds_left
-    global text_color
-    if seconds_left > 0:
-        seconds_left -= 1
-        update_timer(seconds_left, start_time)
-    # make the timer text flash if time has run out
-    if seconds_left == 0:
-        if 'ff0000' in text_color:
-            text_color = ['%ffffff']
-            source.data['text_color'] = text_color
-            source.trigger('data', source.data, source.data)
-        else:
-            text_color = ['ff0000']
-            source.data['text_color'] = text_color
-            source.trigger('data', source.data, source.data)
-
-def update_timer(seconds_remaining, start_time):
-    '''Update the appearance of the timer'''
-    global seconds_left
-    seconds_left = seconds_remaining
-    minutes_remaining = int(seconds_remaining/60)
-    remainder = seconds_remaining%60
-    time_string = ['%02d:%02d' % (minutes_remaining, remainder)]
-    source.data['time_remaining'] = [time_string]
-# change background colour if remaining time <10% of initial value
-    if seconds_remaining <= start_time/10:
-        fill_color = 'ff0000'
-    else:
-        fill_color = '78c400'
-    source.data['text_color'] = ['%ffffff']
-    source.data['fill_color'] = [fill_color]
-    source.trigger('data', source.data, source.data)
-    return True
-
-def run_timer():
-    '''(Re)Set the timer running;
-    disable start button and sliders;
-    enable stop button'''
-    start_button.disabled = True
-    stop_button.disabled = False
-    minutes_slider.disabled = True
-    minutes_slider.disabled = True
-    # set timer running, by calling countdown() every 1000 millisecs
-    bkplt.curdoc().add_periodic_callback(countdown, 1000)
-    return True
-
-def reset_timer():
-    '''Reset the timer to the specified start time'''
-    global seconds_left
-    # check if the timer is running, and stop it if it is
-    if start_button.disabled == True:
-        start_button.disabled = False
-        stop_button.disabled = True
-        minutes_slider.disabled = False
-        minutes_slider.disabled = False
-        # stop calling countdown()
-        bkplt.curdoc().remove_periodic_callback(countdown)
-    update_timer(start_time, start_time)
-    seconds_left = start_time
-
-def stop_timer():
-    '''Stop the timer'''
-    stop_button.disabled = True
-    start_button.disabled = False
-    minutes_slider.disabled = False
-    minutes_slider.disabled = False
-    # stop calling countdown()
-    bkplt.curdoc().remove_periodic_callback(countdown)
-    
-def set_start_time(attrname, old, new):
-    '''Set the start time of the timer'''
-    global start_time
-    start_mins = minutes_slider.value
-    start_secs = seconds_slider.value
-    start_time = start_mins*60 + start_secs
-    # only update timer text if the timer isn't running
-    if not minutes_slider.disabled:
-        update_timer(start_time, start_time)
+from bokeh.models import ColumnDataSource, Button, Slider, CustomJS
 
 # Set default/starting values
-default_minutes = 5
-default_seconds = 0
+default_minutes = 0
+default_seconds = 20
 seconds_left = default_minutes*60 + default_seconds
 # ColumnDataSource data values must be iterable, 
 # so the values below are placed inside single-element lists
 color = ['78c400']
-text_color = ['%ffffff']
+text_color = ['#ffffff']
 start_time = [default_minutes*60 + default_seconds]
-time_remaining = ['%02d:%02d' % (default_minutes, default_seconds)]
-
+time_remaining = start_time.copy()
+time_string = ['%02d:%02d' % (default_minutes, default_seconds)]
 # Create data source for timer plot
 source=ColumnDataSource(data=dict(start_time=start_time,
+                                  start_mins=[default_minutes],
+                                  start_secs=[default_seconds],
                                   time_remaining=time_remaining,
+                                  time_string=time_string,
                                   fill_color=color,
-                                  text_color=text_color))
+                                  text_color=text_color,
+                                  interval_id=[0]))
 
 # No tools required for this one
 tools = ''
+
+# JS Callbacks
+run_timer_JS = CustomJS(args=dict(source=source), code="""
+    function disable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.setAttribute('disabled')
+    }
+    function enable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.removeAttribute('disabled')
+    }
+    var data = source.get('data');
+    var start_button_disabled = start_button.get('disabled');
+    interval_id = data['interval_id'];
+    function countdown() {
+        start_time = data['start_time'];
+        time_remaining = data['time_remaining'];
+        time_string = data['time_string'];
+        text_color = data['text_color'];
+        fill_color = data['fill_color'];
+        if (time_remaining[0] == 0) {
+            if (text_color[0] == '#ffffff') {
+                text_color[0] = '#ff0000';
+            }else {
+                text_color[0] = '#ffffff';
+            }
+        }else{
+            time_remaining[0]--;
+            time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
+            if (time_remaining[0] <= start_time[0]/10) {
+                fill_color[0] = '#ff0000';
+            }
+        }
+        source.trigger('change');
+    }
+    disable_button(start_button);
+    enable_button(stop_button);
+    enable_button(reset_button);
+    interval_id[0] = setInterval(countdown, 1000);
+    source.trigger('change');
+""")
+
+stop_timer_JS = CustomJS(args=dict(source=source), code="""
+    function disable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.setAttribute('disabled')
+    }
+    function enable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.removeAttribute('disabled')
+    }
+    var data = source.get('data');
+    interval_id = data['interval_id'];
+    clearInterval(interval_id[0]);
+    enable_button(start_button);
+    disable_button(stop_button);
+    enable_button(reset_button);
+""")
+
+reset_timer_JS = CustomJS(args=dict(source=source), code="""
+    function disable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.setAttribute('disabled')
+    }
+    function enable_button(button) {
+        button_id = button.get('id');
+        button_element = document.querySelector('#modelid_' + button_id + '>button');
+        button_element.removeAttribute('disabled')
+    }
+    var data = source.get('data');
+    interval_id = data['interval_id'];
+    start_time = data['start_time'];
+    time_remaining = data['time_remaining'];
+    time_string = data['time_string'];
+    text_color = data['text_color'];
+    fill_color = data['fill_color'];
+    text_color[0] = '#ffffff';
+    fill_color[0] = '78c400';
+    if (interval_id[0] != 0) {
+        clearInterval(interval_id[0])
+    }
+    time_remaining[0] = start_time[0];
+    time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
+    enable_button(start_button);
+    disable_button(stop_button);
+    disable_button(reset_button);
+    source.trigger('change');
+""")
+
+set_start_time_JS = CustomJS(args=dict(source=source), code="""
+    var data = source.get('data');
+    var input_mins = mins_slider.get('value');
+    var input_secs = secs_slider.get('value');
+    time_string = data['time_string'];
+    time_remaining = data['time_remaining'];
+    start_button_id = start_button.get('id');
+    start_button_element = document.querySelector('#modelid_' + start_button_id + '>button');
+    start_time = data['start_time'];
+    start_time[0] = (input_mins * 60) + (input_secs);
+    if (start_button_element.hasAttribute('disabled')) {
+    } else {
+        time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
+    }
+    source.trigger('change');
+""")
 
 # Create plot: a color block, with text centered inside
 p1 = bkplt.figure(x_range=(-8, 8), y_range=(-5, 5), 
                   plot_width=900, plot_height=600, 
                   title=None, tools=tools)
-p1.rect(x=[0], 
-        y=[0], 
-        width=16, 
-        height=10, 
+p1.rect(x=[0], y=[0], 
+        width=16, height=10, 
         fill_color='fill_color', 
         line_color=None, 
         name='block',
         source=source)
-p1.text(x=[0], 
-        y=[0], 
-        text='time_remaining', 
+p1.text(x=[0], y=[0], 
+        text='time_string', 
         text_color='text_color', 
         alpha=0.75, 
         text_font_size='128pt', 
@@ -147,22 +174,28 @@ p1.axis.minor_tick_line_color = None
 # Sliders
 minutes_slider = Slider(start=0, end=99, 
                         value=default_minutes, step=1, 
-                        title="Minutes")
-minutes_slider.on_change("value", set_start_time)
+                        title="Minutes", 
+                        callback=set_start_time_JS)
 seconds_slider = Slider(start=0, end=59, 
                         value=default_seconds, step=1, 
-                        title="Seconds")
-seconds_slider.on_change("value", set_start_time)
+                        title="Seconds", 
+                        callback=set_start_time_JS)
+set_start_time_JS.args['mins_slider'] = minutes_slider
+set_start_time_JS.args['secs_slider'] = seconds_slider
 
 # Buttons
-start_button = Button(label="Start")
-start_button.on_click(run_timer)
-stop_button = Button(label="Stop")
-stop_button.on_click(stop_timer)
-reset_button = Button(label="Reset")
-reset_button.on_click(reset_timer)
+start_button = Button(label="Start", callback=run_timer_JS)
+run_timer_JS.args['start_button'] = stop_timer_JS.args['start_button'] = reset_timer_JS.args['start_button'] = set_start_time_JS.args['start_button'] = start_button
+stop_button = Button(label="Stop", callback=stop_timer_JS)
+run_timer_JS.args['stop_button'] = stop_timer_JS.args['stop_button'] = reset_timer_JS.args['stop_button'] = stop_button
+reset_button = Button(label="Reset", callback=reset_timer_JS)
+run_timer_JS.args['reset_button'] = stop_timer_JS.args['reset_button'] = reset_timer_JS.args['reset_button'] = reset_button
 
 # Layout plot & widgets
-bkplt.curdoc().add_root(column(row(minutes_slider, seconds_slider), 
-                               row(start_button, stop_button, reset_button), 
-                               p1))
+layout = column(row(minutes_slider, seconds_slider), 
+                row(start_button, stop_button, reset_button), 
+                p1)
+
+# Show figure
+bkplt.output_file('browsertimer.html')
+bkplt.show(layout)
