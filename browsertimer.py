@@ -114,7 +114,9 @@ source=ColumnDataSource(data=dict(start_time=start_time,
 tools = ''
 
 # Create plot: a color block, with text centered inside
-p1 = bkplt.figure(x_range=(-8, 8), y_range=(-5, 5), plot_width=900, plot_height=600, title=None, tools=tools)
+p1 = bkplt.figure(x_range=(-8, 8), y_range=(-5, 5), 
+                  plot_width=900, plot_height=600, 
+                  title=None, tools=tools)
 p1.rect(x=[0], 
         y=[0], 
         width=16, 
@@ -143,9 +145,13 @@ p1.axis.major_tick_line_color = None
 p1.axis.minor_tick_line_color = None
 
 # Sliders
-minutes_slider = Slider(start=0, end=99, value=default_minutes, step=1, title="Minutes")
+minutes_slider = Slider(start=0, end=99, 
+                        value=default_minutes, step=1, 
+                        title="Minutes")
 minutes_slider.on_change("value", set_start_time)
-seconds_slider = Slider(start=0, end=59, value=default_seconds, step=1, title="Seconds")
+seconds_slider = Slider(start=0, end=59, 
+                        value=default_seconds, step=1, 
+                        title="Seconds")
 seconds_slider.on_change("value", set_start_time)
 
 # Buttons
@@ -157,4 +163,6 @@ reset_button = Button(label="Reset")
 reset_button.on_click(reset_timer)
 
 # Layout plot & widgets
-bkplt.curdoc().add_root(column(row(minutes_slider, seconds_slider), row(start_button, stop_button, reset_button), p1))
+bkplt.curdoc().add_root(column(row(minutes_slider, seconds_slider), 
+                               row(start_button, stop_button, reset_button), 
+                               p1))
