@@ -18,7 +18,7 @@ seconds_left = default_minutes*60 + default_seconds
 color = ['78c400']
 text_color = ['#ffffff']
 start_time = [default_minutes*60 + default_seconds]
-time_remaining = start_time.copy()
+time_remaining = list(start_time)
 time_string = ['%02d:%02d' % (default_minutes, default_seconds)]
 # Create data source for timer plot
 source=ColumnDataSource(data=dict(start_time=start_time,
@@ -38,7 +38,7 @@ run_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
@@ -79,7 +79,7 @@ stop_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
@@ -98,7 +98,7 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
