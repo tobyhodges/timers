@@ -16,10 +16,10 @@ As the script uses the `\a` notation to ring the system bell, this script won't 
 
 ### browsertimer.py - Using bokeh to produce a countdown timer
 
-_browsertimer.py_ uses the bokeh server to create an HTML timer that counts down from a user-defined time to zero. To run the script, call it with the bokeh server e.g. as below:
+_browsertimer.py_ uses JavaScript callbacks with `bokeh.plotting` to create an HTML timer that counts down from a user-defined time to zero.
 
 ```Bash
-bokeh server --show browsertimer.py
+python browsertimer.py
 ```
 
 When the timer launches in the browser, you can use the sliders to adjust the limit on the timer, and the buttons to start, stop/pause, and reset the timer.
@@ -27,7 +27,6 @@ When the timer launches in the browser, you can use the sliders to adjust the li
 #### Requirements
 - [bokeh](http://bokeh.pydata.org/en/latest/index.html) 0.12 or above
 
-#### Issues - Help/Advice Welcome!
-- I'm troubled by the inclusion of `global` statements in the code. I think that there must be a way to achieve the same behavious without these statements. If you have advice on how I might do this, please get in touch!
-- (Possibly related to the above point.) I suspect that could be a way to achieve the countdown behaviour of the timer entirely on the browser side i.e. by using BokehJS callbacks instead of `bokeh server`. As above, if you have advice on how I might achieve this, your input is very welcome.
+#### Acknowledgements
+- Thanks to my colleagues Grischa Toedt & Holger Dinkel for advice on how to remove `global` statements and dependency on the `bokeh server`.
 
