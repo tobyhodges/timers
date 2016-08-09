@@ -8,6 +8,7 @@ usage: python browsertimer.py
 from bokeh.layouts import column, row
 from bokeh import plotting as bkplt
 from bokeh.models import ColumnDataSource, Button, Slider, CustomJS
+from bokeh.embed import components
 
 # Set default/starting values
 default_minutes = 5
@@ -145,7 +146,7 @@ set_start_time_JS = CustomJS(args=dict(source=source), code="""
 
 # Create plot: a color block, with text centered inside
 p1 = bkplt.figure(x_range=(-8, 8), y_range=(-5, 5), 
-                  plot_width=900, plot_height=600, 
+                  plot_width=600, plot_height=400, 
                   title=None, tools=tools)
 p1.rect(x=[0], y=[0], 
         width=16, height=10, 
@@ -157,7 +158,7 @@ p1.text(x=[0], y=[0],
         text='time_string', 
         text_color='text_color', 
         alpha=0.75, 
-        text_font_size='128pt', 
+        text_font_size='100pt', 
         text_baseline='middle', 
         text_align='center', 
         name='timer',
@@ -198,4 +199,7 @@ layout = column(row(minutes_slider, seconds_slider),
 
 # Show figure
 bkplt.output_file('browsertimer.html', title="Countdown Timer")
-bkplt.show(layout)
+script, div = components(layout)
+print(script)
+print(div)
+# bkplt.show(layout)
