@@ -38,7 +38,7 @@ run_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
@@ -79,7 +79,7 @@ stop_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
@@ -98,7 +98,7 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled');
+        button_element.setAttribute('disabled',true);
     }
     function enable_button(button) {
         button_id = button.get('id');
