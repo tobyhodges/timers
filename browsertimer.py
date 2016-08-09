@@ -121,7 +121,6 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
     enable_button(start_button);
     disable_button(stop_button);
-    disable_button(reset_button);
     source.trigger('change');
 """)
 
