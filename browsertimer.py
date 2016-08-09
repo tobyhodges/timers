@@ -18,7 +18,7 @@ seconds_left = default_minutes*60 + default_seconds
 color = ['78c400']
 text_color = ['#ffffff']
 start_time = [default_minutes*60 + default_seconds]
-time_remaining = start_time.copy()
+time_remaining = list(start_time)
 time_string = ['%02d:%02d' % (default_minutes, default_seconds)]
 # Create data source for timer plot
 source=ColumnDataSource(data=dict(start_time=start_time,
