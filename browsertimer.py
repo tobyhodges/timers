@@ -2,7 +2,7 @@
 '''
 A script to create a simple, browser-based countdown timer.
 
-usage: bokeh serve --show timer.py
+usage: python browsertimer.py
 '''
 # Imports
 from bokeh.layouts import column, row
@@ -10,8 +10,8 @@ from bokeh import plotting as bkplt
 from bokeh.models import ColumnDataSource, Button, Slider, CustomJS
 
 # Set default/starting values
-default_minutes = 0
-default_seconds = 20
+default_minutes = 5
+default_seconds = 0
 seconds_left = default_minutes*60 + default_seconds
 # ColumnDataSource data values must be iterable, 
 # so the values below are placed inside single-element lists
@@ -38,15 +38,14 @@ run_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled')
+        button_element.setAttribute('disabled');
     }
     function enable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.removeAttribute('disabled')
+        button_element.removeAttribute('disabled');
     }
     var data = source.get('data');
-    var start_button_disabled = start_button.get('disabled');
     interval_id = data['interval_id'];
     function countdown() {
         start_time = data['start_time'];
@@ -80,12 +79,12 @@ stop_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled')
+        button_element.setAttribute('disabled');
     }
     function enable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.removeAttribute('disabled')
+        button_element.removeAttribute('disabled');
     }
     var data = source.get('data');
     interval_id = data['interval_id'];
@@ -99,12 +98,12 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     function disable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.setAttribute('disabled')
+        button_element.setAttribute('disabled');
     }
     function enable_button(button) {
         button_id = button.get('id');
         button_element = document.querySelector('#modelid_' + button_id + '>button');
-        button_element.removeAttribute('disabled')
+        button_element.removeAttribute('disabled');
     }
     var data = source.get('data');
     interval_id = data['interval_id'];
@@ -116,7 +115,7 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     text_color[0] = '#ffffff';
     fill_color[0] = '78c400';
     if (interval_id[0] != 0) {
-        clearInterval(interval_id[0])
+        clearInterval(interval_id[0]);
     }
     time_remaining[0] = start_time[0];
     time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
@@ -138,6 +137,7 @@ set_start_time_JS = CustomJS(args=dict(source=source), code="""
     start_time[0] = (input_mins * 60) + (input_secs);
     if (start_button_element.hasAttribute('disabled')) {
     } else {
+        time_remaining[0] = start_time[0];
         time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
     }
     source.trigger('change');
@@ -186,7 +186,7 @@ set_start_time_JS.args['secs_slider'] = seconds_slider
 # Buttons
 start_button = Button(label="Start", callback=run_timer_JS)
 run_timer_JS.args['start_button'] = stop_timer_JS.args['start_button'] = reset_timer_JS.args['start_button'] = set_start_time_JS.args['start_button'] = start_button
-stop_button = Button(label="Stop", callback=stop_timer_JS)
+stop_button = Button(label="Stop", disabled=True, callback=stop_timer_JS)
 run_timer_JS.args['stop_button'] = stop_timer_JS.args['stop_button'] = reset_timer_JS.args['stop_button'] = stop_button
 reset_button = Button(label="Reset", callback=reset_timer_JS)
 run_timer_JS.args['reset_button'] = stop_timer_JS.args['reset_button'] = reset_timer_JS.args['reset_button'] = reset_button
@@ -197,5 +197,5 @@ layout = column(row(minutes_slider, seconds_slider),
                 p1)
 
 # Show figure
-bkplt.output_file('browsertimer.html')
+bkplt.output_file('browsertimer.html', title="Countdown Timer")
 bkplt.show(layout)
