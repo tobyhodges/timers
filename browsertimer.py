@@ -71,8 +71,10 @@ run_timer_JS = CustomJS(args=dict(source=source), code="""
     disable_button(start_button);
     enable_button(stop_button);
     enable_button(reset_button);
-    interval_id[0] = setInterval(countdown, 1000);
-    source.trigger('change');
+    if (interval_id[0] == 0) {
+        interval_id[0] = setInterval(countdown, 1000);
+        source.trigger('change');
+    }
 """)
 
 stop_timer_JS = CustomJS(args=dict(source=source), code="""
@@ -88,10 +90,14 @@ stop_timer_JS = CustomJS(args=dict(source=source), code="""
     }
     var data = source.get('data');
     interval_id = data['interval_id'];
-    clearInterval(interval_id[0]);
+    if (interval_id[0] != 0){
+        clearInterval(interval_id[0]);
+        interval_id[0] = 0;
+    }
     enable_button(start_button);
     disable_button(stop_button);
     enable_button(reset_button);
+    source.trigger('change');
 """)
 
 reset_timer_JS = CustomJS(args=dict(source=source), code="""
@@ -116,6 +122,7 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     fill_color[0] = '#78c400';
     if (interval_id[0] != 0) {
         clearInterval(interval_id[0]);
+        interval_id[0] = 0;
     }
     time_remaining[0] = start_time[0];
     time_string[0] = ('0' + Math.floor(time_remaining[0] / 60)).slice(-2) + ':' + ('0' + Math.floor(time_remaining[0] % 60)).slice(-2);
