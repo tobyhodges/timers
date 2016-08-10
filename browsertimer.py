@@ -15,7 +15,7 @@ default_seconds = 0
 seconds_left = default_minutes*60 + default_seconds
 # ColumnDataSource data values must be iterable, 
 # so the values below are placed inside single-element lists
-color = ['78c400']
+color = ['#78c400']
 text_color = ['#ffffff']
 start_time = [default_minutes*60 + default_seconds]
 time_remaining = list(start_time)
