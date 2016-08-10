@@ -113,7 +113,7 @@ reset_timer_JS = CustomJS(args=dict(source=source), code="""
     text_color = data['text_color'];
     fill_color = data['fill_color'];
     text_color[0] = '#ffffff';
-    fill_color[0] = '78c400';
+    fill_color[0] = '#78c400';
     if (interval_id[0] != 0) {
         clearInterval(interval_id[0]);
     }
