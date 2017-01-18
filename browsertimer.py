@@ -21,7 +21,9 @@ start_time = [default_minutes*60 + default_seconds]
 time_remaining = list(start_time)
 time_string = ['%02d:%02d' % (default_minutes, default_seconds)]
 # Create data source for timer plot
-source=ColumnDataSource(data=dict(start_time=start_time,
+source=ColumnDataSource(data=dict(x=[0],
+                                  y=[0],
+                                  start_time=start_time,
                                   start_mins=[default_minutes],
                                   start_secs=[default_seconds],
                                   time_remaining=time_remaining,
@@ -153,13 +155,13 @@ set_start_time_JS = CustomJS(args=dict(source=source), code="""
 p1 = bkplt.figure(x_range=(-8, 8), y_range=(-5, 5), 
                   plot_width=900, plot_height=600, 
                   title=None, tools=tools)
-p1.rect(x=[0], y=[0], 
+p1.rect(x='x', y='y', 
         width=16, height=10, 
         fill_color='fill_color', 
         line_color=None, 
         name='block',
         source=source)
-p1.text(x=[0], y=[0], 
+p1.text(x='x', y='y', 
         text='time_string', 
         text_color='text_color', 
         alpha=0.75, 
